@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+
 import {
   Banknote,
   Plus,
@@ -21,6 +22,7 @@ import { LoanDetail, Customer } from "../types";
 import { LoanDocumentModal } from "../components/LoanDocumentModal";
 import { calculateLoan, LoanCalculationResult, ScheduleItem } from "../services/calculator";
 import { getTodayIST, formatISTDisplay, parseISTDate } from "../utils/date";
+import { usePopupLock } from "../hooks/usePopupLock";
 
 // ─────────────────────────────────────────────────────────────
 // Helpers
@@ -59,6 +61,12 @@ export const LoansScreen: React.FC = () => {
 
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  usePopupLock(showCreateModal, () => setShowCreateModal(false));
+  usePopupLock(showConfirmModal, () => setShowConfirmModal(false));
+  usePopupLock(showScheduleModal, () => setShowScheduleModal(false));
+  usePopupLock(showDocModal, () => setShowDocModal(false));
+  usePopupLock(!!selectedLoan, () => setSelectedLoan(null));
 
   // ── Form State ─────────────────────────────────────────────
   const [selectedCustomerId, setSelectedCustomerId] = useState("");
