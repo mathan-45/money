@@ -97,7 +97,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onTabChange })
               }`}
             >
               <Icon className={`w-5 h-5 ${isActive ? "stroke-[2.5]" : "stroke-[1.75]"}`} />
-              <span className="text-[11px] mt-1 truncate">
+              <span className="text-[10px] mt-1 leading-tight text-center break-words">
                 {language === "ta" ? tab.labelTa : tab.labelEn}
               </span>
             </button>
