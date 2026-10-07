@@ -18,6 +18,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import { Customer } from "../types";
+import { usePopupLock } from "../hooks/usePopupLock";
 
 export const CustomersScreen: React.FC = () => {
   const { language } = useAuth();
@@ -36,6 +37,9 @@ export const CustomersScreen: React.FC = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
+
+  usePopupLock(showAddModal, () => setShowAddModal(false));
+  usePopupLock(!!selectedCustomer, () => setSelectedCustomer(null)); 
 
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
