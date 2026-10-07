@@ -711,6 +711,12 @@ export const api = {
       body: JSON.stringify(data),
     });
   },
+  
+  async deleteCustomer(id: string): Promise<{ success: boolean }> {
+    return apiRequest<{ success: boolean }>(`/api/customers/${id}`, {
+      method: "DELETE",
+    });
+  },
 
   // Loans Module
   async getLoans(status?: string, query?: string): Promise<{ loans: LoanDetail[] }> {

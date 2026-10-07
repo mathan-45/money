@@ -15,6 +15,7 @@ import {
   FileText,
   ChevronRight,
 } from "lucide-react";
+  Trash2,
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import { Customer } from "../types";
@@ -40,6 +41,10 @@ export const CustomersScreen: React.FC = () => {
 
   usePopupLock(showAddModal, () => setShowAddModal(false));
   usePopupLock(!!selectedCustomer, () => setSelectedCustomer(null)); 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  usePopupLock(showDeleteConfirm, () => setShowDeleteConfirm(false));
 
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
@@ -86,6 +91,22 @@ export const CustomersScreen: React.FC = () => {
     }
   };
 
+  const handleDeleteCustomer = async () => {
+    if (!selectedCustomer) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await api.deleteCustomer(selectedCustomer.id);
+      setShowDeleteConfirm(false);
+      setSelectedCustomer(null);
+      fetchCustomers(true);
+    } catch (err: any) {
+      setDeleteError(err?.message || "Failed to delete customer");
+    } finally {
+      setDeleting(false);
+    }
+  };
+  
   const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !mobile.trim()) {
@@ -396,10 +417,56 @@ export const CustomersScreen: React.FC = () => {
                 </div>
               </div>
             )}
+                        {!loadingDetails && Array.isArray(selectedCustomer.loans) && selectedCustomer.loans.length === 0 && (
+              <button
+                type="button"
+                onClick={() => { setDeleteError(null); setShowDeleteConfirm(true); }}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-xs font-bold"
+              >
+                <Trash2 className="w-4 h-4" /> Delete Customer
+              </button>
+            )}
+            {!loadingDetails && Array.isArray(selectedCustomer.loans) && selectedCustomer.loans.length > 0 && (
+              <p className="text-[11px] text-slate-400 text-center">
+                Customers with loans cannot be deleted.
+              </p>
+            )}
           </div>
         </div>
       )}
 
+           {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && selectedCustomer && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">Delete customer?</h3>
+            <p className="text-xs text-slate-500">
+              {selectedCustomer.name} will be removed permanently. This cannot be undone.
+            </p>
+            {deleteError && (
+              <p className="text-xs text-red-600 dark:text-red-400">{deleteError}</p>
+            )}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={handleDeleteCustomer}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold disabled:opacity-60"
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Add Customer Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
