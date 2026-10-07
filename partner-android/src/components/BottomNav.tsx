@@ -47,7 +47,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onTabChange, p
                   </span>
                 )}
               </div>
-              <span className="text-[11px] mt-1 truncate">
+              <span className="text-[10px] mt-1 leading-tight text-center break-words">
                 {language === "ta" ? tab.labelTa : tab.labelEn}
               </span>
             </button>
