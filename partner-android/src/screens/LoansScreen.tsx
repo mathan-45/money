@@ -640,7 +640,7 @@ export const LoansScreen: React.FC = () => {
                         <div className={`flex items-center gap-1 mb-0.5 font-bold text-[11px] ${active ? (l.color === "indigo" ? "text-indigo-700" : l.color === "emerald" ? "text-emerald-700" : "text-amber-700") : "text-slate-500"}`}>
                           {l.icon}<span>{ta ? l.ta : l.en}</span>
                         </div>
-                        {active && <span className={`text-[9px] font-bold ${l.color === "indigo" ? "text-indigo-600" : l.color === "emerald" ? "text-emerald-600" : "text-amber-600"}`}>✓ {ta ? "தேர்ந்தெடுக்கப்பட்டது" : "Selected"}</span>}
+                        {active && <span className={`block break-words leading-tight text-[9px] font-bold ${l.color === "indigo" ? "text-indigo-600" : l.color === "emerald" ? "text-emerald-600" : "text-amber-600"}`}>✓ {ta ? "தேர்ந்தெடுக்கப்பட்டது" : "Selected"}</span>}
                       </button>
                     );
                   })}
