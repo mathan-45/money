@@ -16,6 +16,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { usePopupLock } from "../hooks/usePopupLock";
 import { api, getServerUrl, setServerUrl, DEFAULT_PRODUCTION_URL } from "../services/api";
 import { LoanPayment } from "../types";
 
@@ -52,6 +53,9 @@ export const MoreScreen: React.FC = () => {
 
   // Server Settings State
   const [showServerModal, setShowServerModal] = useState(false);
+    usePopupLock(showPasswordModal, () => setShowPasswordModal(false));
+    usePopupLock(showHistoryModal, () => setShowHistoryModal(false));
+    usePopupLock(showServerModal, () => setShowServerModal(false));
   const [serverUrl, setServerUrlState] = useState(() => getServerUrl());
 
   const fetchHistory = useCallback(async () => {
