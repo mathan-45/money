@@ -788,7 +788,7 @@ export const LoansScreen: React.FC = () => {
               {/* 3b. Advance Interest Fields */}
               {loanCategory === "ADVANCE_INTEREST" && (
                 <div className="space-y-4 p-3.5 bg-emerald-50/60 dark:bg-emerald-950/20 rounded-2xl border border-emerald-200 dark:border-emerald-800">
-                  <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-3 [&_label]:flex [&_label]:min-h-[2rem] [&_label]:items-end">
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">{ta ? "கடன் தொகை / முக மதிப்பு (₹) *" : "Face / Loan Principal (₹) *"}</label>
                       <input type="number" required value={principalAmount} onChange={(e) => { setPrincipalAmount(e.target.value); const p = Number(e.target.value) || 0; const n = Math.max(1, Number(advInstCount) || 1); setAdvInstAmt(String(Math.round(p / n))); }}
@@ -845,7 +845,7 @@ export const LoansScreen: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 gap-2 [&_label]:flex [&_label]:min-h-[2rem] [&_label]:items-end">
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">{ta ? "வசூல் முறை *" : "Frequency *"}</label>
                       <select value={advFreq} onChange={(e) => setAdvFreq(e.target.value as Frequency)}
