@@ -16,6 +16,7 @@ import {
   Shield,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { usePopupLock } from "../hooks/usePopupLock";
 import { api } from "../services/api";
 import { LoanDetail, Customer } from "../types";
 import { LoanDocumentModal } from "../components/LoanDocumentModal";
@@ -61,6 +62,10 @@ export const LoansScreen: React.FC = () => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+    usePopupLock(!!selectedLoan, () => setSelectedLoan(null));
+    usePopupLock(showCreateModal, () => setShowCreateModal(false));
+    usePopupLock(showConfirmModal, () => setShowConfirmModal(false));
+    usePopupLock(showScheduleModal, () => setShowScheduleModal(false));
 
   // Form State
   const [selectedCustomerId, setSelectedCustomerId] = useState("");
