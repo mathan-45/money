@@ -1,4 +1,5 @@
 import React from "react";
+import { usePopupLock } from "../hooks/usePopupLock";
 import { AlertCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -30,6 +31,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isLoading,
 }) => {
   const { language } = useAuth();
+    usePopupLock(isOpen, onCancel);
   if (!isOpen) return null;
 
   return (

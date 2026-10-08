@@ -12,6 +12,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { usePopupLock } from "../hooks/usePopupLock";
 import { api } from "../services/api";
 import { syncManager } from "../services/sync";
 import {
@@ -36,6 +37,7 @@ export const DailyScreen: React.FC = () => {
 
   // Collection modal state
   const [collectingItem, setCollectingItem] = useState<TodayCollectionItem | null>(null);
+    usePopupLock(!!collectingItem, () => setCollectingItem(null));
   const [collectionAmount, setCollectionAmount] = useState<number>(0);
   const [actualDate, setActualDate] = useState<string>(() => getTodayIST());
   const [paymentMethod, setPaymentMethod] = useState<string>("CASH");
