@@ -16,6 +16,7 @@ import {
   Building,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { usePopupLock } from "../hooks/usePopupLock";
 import { api } from "../services/api";
 import { Partner } from "../types";
 
@@ -31,6 +32,8 @@ export const PartnersScreen: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [actionType, setActionType] = useState<"INVEST" | "WITHDRAW" | "SETTLE" | "DETAILS" | null>(null);
+    usePopupLock(showAddModal, () => setShowAddModal(false));
+    usePopupLock(!!actionType && !!selectedPartner, () => setActionType(null));
 
   // Form States
   const [formLoading, setFormLoading] = useState(false);

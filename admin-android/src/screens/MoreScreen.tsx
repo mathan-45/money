@@ -27,6 +27,7 @@ import {
   Scale,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { usePopupLock } from "../hooks/usePopupLock";
 import { api } from "../services/api";
 import {
   IncomeItem,
@@ -99,6 +100,9 @@ export const MoreScreen: React.FC<MoreScreenProps> = ({
   } | null>(null);
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   const [showAddBankModal, setShowAddBankModal] = useState(false);
+    usePopupLock(showAddIncomeModal, () => setShowAddIncomeModal(false));
+    usePopupLock(showAddExpenseModal, () => setShowAddExpenseModal(false));
+    usePopupLock(showAddBankModal, () => setShowAddBankModal(false));
   const [bankName, setBankName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [bankBalance, setBankBalance] = useState("");
