@@ -12,6 +12,7 @@ import {
   Briefcase,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { usePopupLock } from "../hooks/usePopupLock";
 import { api } from "../services/api";
 import { Customer } from "../types";
 
@@ -24,10 +25,12 @@ export const CustomersScreen: React.FC = () => {
 
   // Customer Detail Sheet
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+    usePopupLock(!!selectedCustomer, () => setSelectedCustomer(null));
   const [loadingCustomer, setLoadingCustomer] = useState(false);
 
   // Add Customer Modal
   const [showAddModal, setShowAddModal] = useState(false);
+    usePopupLock(showAddModal, () => setShowAddModal(false));
   const [savingCustomer, setSavingCustomer] = useState(false);
   const [formName, setFormName] = useState("");
   const [formMobile, setFormMobile] = useState("");
