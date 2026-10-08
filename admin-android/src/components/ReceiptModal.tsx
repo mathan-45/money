@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { LoanPayment } from "../types";
 import { useAuth } from "../context/AuthContext";
+import { usePopupLock } from "../hooks/usePopupLock";
 import { api } from "../services/api";
 import {
   generateCollectionReceiptPdf,
@@ -45,6 +46,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
   onClose,
 }) => {
   const { language, user } = useAuth();
+    usePopupLock(isOpen, onClose);
   const [downloading, setDownloading] = useState(false);
   const [printing, setPrinting] = useState(false);
   const [waLoading, setWaLoading] = useState(false);

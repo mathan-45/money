@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { LoanDetail } from "../types";
 import { useAuth } from "../context/AuthContext";
+import { usePopupLock } from "../hooks/usePopupLock";
 import { api } from "../services/api";
 import {
   generateLoanDocumentPdf,
@@ -36,6 +37,7 @@ export const LoanDocumentModal: React.FC<LoanDocumentModalProps> = ({
   onClose,
 }) => {
   const { language } = useAuth();
+    usePopupLock(isOpen, onClose);
   const [downloading, setDownloading] = useState(false);
   const [printing, setPrinting] = useState(false);
   const [waLoading, setWaLoading] = useState(false);

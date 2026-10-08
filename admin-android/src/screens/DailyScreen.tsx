@@ -14,6 +14,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { usePopupLock } from "../hooks/usePopupLock";
 import { api } from "../services/api";
 import {
   TodayCollectionItem,
@@ -42,6 +43,7 @@ export const DailyScreen: React.FC<DailyScreenProps> = ({ onBack }) => {
 
   // Payment Recording Modal
   const [selectedItem, setSelectedItem] = useState<TodayCollectionItem | null>(null);
+    usePopupLock(!!selectedItem, () => setSelectedItem(null));
   const [collectAmount, setCollectAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [collectNotes, setCollectNotes] = useState("");
