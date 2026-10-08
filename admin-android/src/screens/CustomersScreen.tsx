@@ -14,8 +14,8 @@ import {
   MessageSquare,
   FileText,
   ChevronRight,
-} from "lucide-react";
   Trash2,
+} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import { Customer } from "../types";
