@@ -624,6 +624,12 @@ export const api = {
   async getCustomer(id: string): Promise<{ customer: Customer }> {
     return apiRequest<{ customer: Customer }>(`/api/customers/${id}`);
   },
+  
+  async deleteCustomer(id: string): Promise<{ success: boolean }> {
+    return apiRequest<{ success: boolean }>(`/api/customers/${id}`, {
+      method: "DELETE",
+    });
+  },
 
   async createCustomer(customerData: {
     name: string;
