@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth/session";
 
 export async function GET(
   req: Request,
@@ -82,6 +83,20 @@ export async function DELETE(
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
 
+    // Only an admin may delete a customer who already has loans
+    // (this cascades to loans, payments and ledger entries)
+    if (customer.loans.length > 0) {
+      const user = await getCurrentUser();
+      if (!user || user.role !== "ADMIN") {
+        return NextResponse.json(
+          { error: "Only an admin can delete a customer who has loans" },
+          { status: 403 }
+        );
+      }
+    }
+    
+    
+    
     // Clean up ledger transactions specifically linked to this customer's loans
     const loanIds = customer.loans.map((l) => l.id);
     if (loanIds.length > 0) {
