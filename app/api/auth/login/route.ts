@@ -63,6 +63,15 @@ export async function POST(req: Request) {
       );
     }
 
+    if (user.isLocked) {
+      return NextResponse.json(
+        { error: "Your account is waiting for admin approval" },
+        { status: 403, headers: corsHeaders }
+      );
+    }
+    
+    
+    
     const permissions = parsePermissions(user.permissions, user.role);
 
     const sessionPayload = {
