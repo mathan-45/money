@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const name = String(body.name || "").trim();
-    const username = String(body.username || "").trim();
+    const username = String(body.username || "").trim().toLowerCase();
     const password = String(body.password || "");
 
     if (name.length < 2 || name.length > 60) {
