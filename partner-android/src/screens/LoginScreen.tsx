@@ -24,6 +24,10 @@ export const LoginScreen: React.FC = () => {
   const [diagnostic, setDiagnostic] = useState<DiagnosticInfo>(() => getDiagnosticInfo());
   const [pinging, setPinging] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(true);
+  const [signupMode, setSignupMode] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [signupMessage, setSignupMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = subscribeDiagnostic((info) => {
@@ -52,6 +56,38 @@ export const LoginScreen: React.FC = () => {
     }
   };
 
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSignupMessage(null);
+    if (!fullName.trim() || !username.trim() || !password) {
+      setError("Name, username and password are required");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await api.register(fullName.trim(), username.trim().toLowerCase(), password);
+      setSignupMessage(res.message);
+      setSignupMode(false);
+      setPassword("");
+      setConfirmPassword("");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to create account. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
   const handlePing = async () => {
     setPinging(true);
     setError(null);
@@ -114,7 +150,7 @@ export const LoginScreen: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className={signupMode ? "hidden" : "space-y-4"}>
           <div className="space-y-1">
             <label className="text-xs text-slate-400 font-medium">
               {language === "ta" ? "பயனர் பெயர்" : "Username"}
@@ -168,6 +204,83 @@ export const LoginScreen: React.FC = () => {
             )}
           </button>
         </form>
+        {signupMessage && !signupMode && (
+          <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs p-3.5 rounded-xl">
+            {signupMessage}
+          </div>
+        )}
+
+        {signupMode && (
+          <form onSubmit={handleSignUp} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-xs text-slate-400 font-medium">Full Name</label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Your name"
+                className="w-full bg-slate-800/80 border border-slate-700 rounded-xl py-3 px-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-slate-400 font-medium">Username</label>
+              <input
+                type="text"
+                autoCapitalize="none"
+                autoCorrect="off"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="letters, numbers, . _ -"
+                className="w-full bg-slate-800/80 border border-slate-700 rounded-xl py-3 px-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-slate-400 font-medium">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="At least 8 characters"
+                className="w-full bg-slate-800/80 border border-slate-700 rounded-xl py-3 px-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-slate-400 font-medium">Confirm Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter password"
+                className="w-full bg-slate-800/80 border border-slate-700 rounded-xl py-3 px-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-600/30 disabled:opacity-60"
+            >
+              {loading ? "Creating..." : "Create Account"}
+            </button>
+            <p className="text-[11px] text-slate-500 text-center">
+              An admin must approve your account before you can sign in.
+            </p>
+          </form>
+        )}
+
+        <div className="text-center text-xs text-slate-400">
+          {signupMode ? "Already have an account?" : "New partner?"}{" "}
+          <button
+            type="button"
+            onClick={() => {
+              setSignupMode(!signupMode);
+              setError(null);
+              setSignupMessage(null);
+            }}
+            className="text-indigo-400 hover:text-indigo-300 font-semibold underline"
+          >
+            {signupMode ? "Sign In" : "Sign Up"}
+          </button>
+        </div>
 
         {import.meta.env.DEV && (
           <>
