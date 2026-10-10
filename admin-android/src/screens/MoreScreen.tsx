@@ -25,6 +25,7 @@ import {
   Calendar,
   Wallet,
   Scale,
+  UserPlus,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { usePopupLock } from "../hooks/usePopupLock";
@@ -49,6 +50,7 @@ export type MoreSubview =
   | "day_closing"
   | "settings"
   | "audit_logs"
+  | "signups"
   | "password";
 
 interface MoreScreenProps {
@@ -220,6 +222,43 @@ export const MoreScreen: React.FC<MoreScreenProps> = ({
   }, [subview, reportType, loadIncomeExpense, loadCashAndBank, loadReports, loadDayClosing, loadSettings, loadAuditLogs]);
 
   // Handlers
+  // Sign-up requests (admin approval)
+  const [signups, setSignups] = useState<Array<{ id: string; username: string; name: string; createdAt: string }>>([]);
+  const [signupsLoading, setSignupsLoading] = useState(false);
+  const [signupsError, setSignupsError] = useState<string | null>(null);
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
+
+  const loadSignups = useCallback(async () => {
+    setSignupsLoading(true);
+    setSignupsError(null);
+    try {
+      const data = await api.getSignups();
+      setSignups(data.signups || []);
+    } catch (err: any) {
+      setSignupsError(err?.message || "Failed to load sign-up requests");
+    } finally {
+      setSignupsLoading(false);
+    }
+  }, []);
+
+  const reviewSignup = async (userId: string, action: "APPROVE" | "REJECT") => {
+    setReviewingId(userId);
+    setSignupsError(null);
+    try {
+      await api.reviewSignup(userId, action);
+      await loadSignups();
+    } catch (err: any) {
+      setSignupsError(err?.message || "Failed to update request");
+    } finally {
+      setReviewingId(null);
+    }
+  };
+
+  useEffect(() => {
+    if (subview === "signups") loadSignups();
+  }, [subview, loadSignups]);
+  
+  
   const handleAddIncome = async (e: React.FormEvent) => {
     e.preventDefault();
     const amt = parseFloat(ieAmount);
@@ -1331,6 +1370,75 @@ export const MoreScreen: React.FC<MoreScreenProps> = ({
     );
   }
 
+  // 6b. Sign-up Requests
+  if (subview === "signups") {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
+        <div className="bg-slate-900 text-white px-5 pt-4 pb-6 rounded-b-3xl shadow-lg">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSubview(null)}
+              className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-white"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div>
+              <h1 className="text-xl font-bold">Sign-up Requests</h1>
+              <p className="text-xs text-slate-400 mt-0.5">Approve or reject new partner accounts</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-4 mt-4 space-y-3">
+          {signupsError && (
+            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-xs">
+              {signupsError}
+            </div>
+          )}
+          {signupsLoading ? (
+            <p className="text-center text-xs text-slate-400 py-8">Loading...</p>
+          ) : signups.length === 0 ? (
+            <p className="text-center text-xs text-slate-400 py-8">No pending sign-up requests</p>
+          ) : (
+            signups.map((s) => (
+              <div
+                key={s.id}
+                className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-3"
+              >
+                <div>
+                  <h2 className="text-sm font-bold text-slate-900 dark:text-white">{s.name}</h2>
+                  <p className="text-[11px] text-slate-400">
+                    @{s.username} · {new Date(s.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={reviewingId === s.id}
+                    onClick={() => reviewSignup(s.id, "REJECT")}
+                    className="flex-1 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold disabled:opacity-60"
+                  >
+                    Reject
+                  </button>
+                  <button
+                    type="button"
+                    disabled={reviewingId === s.id}
+                    onClick={() => reviewSignup(s.id, "APPROVE")}
+                    className="flex-1 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold disabled:opacity-60"
+                  >
+                    Approve
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+  
+  
   // 7. Change Password
   if (subview === "password") {
     return (
@@ -1464,6 +1572,13 @@ export const MoreScreen: React.FC<MoreScreenProps> = ({
       subtitle: "Chronological administrative action history",
       icon: History,
       color: "text-cyan-500 bg-cyan-50 dark:bg-cyan-950/40",
+    },
+    {
+      id: "signups" as MoreSubview,
+      title: "Sign-up Requests",
+      subtitle: "Approve or reject new partner accounts",
+      icon: UserPlus,
+      color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40",
     },
     {
       id: "password" as MoreSubview,
